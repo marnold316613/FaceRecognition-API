@@ -1,5 +1,5 @@
 const handleHome = (req,res) => {
-  res.json(database.users);
+  res.json('success');
 };
 
 
