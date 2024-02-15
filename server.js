@@ -13,12 +13,8 @@ const clarifaiController = require('./controllers/clarifai');
 const db= knex({
   client: 'pg',
   connection: {
-    host : '127.0.0.1',
-    port : 5432,
-    user : 'smart-brain',
-    password : 'Southern1!%',
-    database : 'smart-brain',
-    debug:true
+    host : process.env.DATABASE_URL,
+    ssl:true
   }
 });
 
