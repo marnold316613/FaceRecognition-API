@@ -4,8 +4,16 @@ const handleRegister = (req,res,db,bcrypt) => {
   {
     return res.status(400).json('Error');
   }
+  
+  const check =db.select('email').from('login').where({
+    email: email
+  })
+  if (check.length) {
+    return res.status(400).json('Error');
+  }
 
   const hash = bcrypt.hashSync(password);
+  
   db.transaction(trx =>
   {
     trx('login').insert({
