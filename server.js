@@ -12,7 +12,7 @@ const clarifaiController = require('./controllers/clarifai');
 
 
 const pool = (() => {
-  if (process.env.NODE_ENV !=='productions') 
+  if (process.env.NODE_ENV !=='production') 
   {
     return { 
       host : '127.0.0.1',
