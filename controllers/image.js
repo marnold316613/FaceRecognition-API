@@ -1,4 +1,9 @@
-const handleImage = (req,res,db) => {
+const handleImage = (req,res,db,validationResult) => {
+  if (!validationResult.isEmpty())
+  {
+    return res.status(400).json('Error');
+  }
+  
   const {id} = req.body;
 
   db.increment({entries:1}).from('users').where('id', '=',id).returning('entries')

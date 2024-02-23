@@ -35,24 +35,28 @@ const clarifaiSetup = (url) => {
 }
 
 
-const handleClarifai = (req,res) =>{
-const {input} = req.body;
+const handleClarifai = (req,res,validationResult) =>{
 
+  if (!validationResult.isEmpty())
+  {
+    return res.status(400).json('Error');
+  }
+
+const {input} = req.body;
+console.log(input);
 const url="https://api.clarifai.com/v2/models/" + MODEL_ID + "/versions/" + MODEL_VERSION_ID + "/outputs";
-const setup=clarifaiSetup(input)
-  fetch(url, setup)
+const setup=clarifaiSetup(input);
+
+fetch(url, setup)
   .then( async data => {
     if (data.ok) {
-        const response = await data.json();
-      //  console.log(response);  
-         res.json(response);
+      const response = await data.json();
+      res.json(response);
      
     }
     else {
       res.status(400).json('Error');
     }
-  
-    
   })
   .catch(err => {res.status(400).json('Error');
   console.log('clarifai api error',err);

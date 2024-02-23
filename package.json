@@ -5,7 +5,7 @@
   "main": "face-recognition-api.js",
   "scripts": {
     "start": "node server.js",
-    "start:dev" : "nodemon --env-file=.env server.js"
+    "start:dev": "nodemon --env-file=.env server.js"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
     "bcrypt-nodejs": "^0.0.3",
     "cors": "^2.8.5",
     "express": "^4.18.2",
+    "express-validator": "^7.0.1",
     "knex": "^3.1.0",
     "pg": "^8.11.3"
   }

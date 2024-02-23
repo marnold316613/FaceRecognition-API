@@ -1,4 +1,5 @@
 const express = require('express');
+const {body,validationResult} = require('express-validator');
 const app = express();
 const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
@@ -11,16 +12,17 @@ const homeController = require('./controllers/home');
 const clarifaiController = require('./controllers/clarifai');
 
 
+
 const pool = (() => {
   if (process.env.NODE_ENV !=='production') 
   {
     return { 
-      host : '127.0.0.1',
-      port : 5432,
-      user : 'smart-brain',
-      password : 'Southern1!%',
-      database : 'smart-brain'
-      
+      host : process.env.DBHOST,
+      port : process.env.DBPORT,
+      user : process.env.DBUSER,
+      password : process.env.DBPASSWORD,
+      database : process.env.DBDATABASE
+    
     }
   } else {
     return {
@@ -31,19 +33,12 @@ const pool = (() => {
     }
   }
 })
-console.log(pool());
 const db= knex({
   client: 'pg',
   connection: pool()
   }
 );
-
-
-
-
-
 const PORT =process.env.PORT;
-
 
 // this will test for a valid connection string
 db.raw("select 1").then( ()=> {
@@ -67,15 +62,47 @@ app.use(cors());
 
 app.get('/', (req,res) =>{ homeController.handleHome (req,res)});
 
-app.post('/signin',(req,res) =>{ signinController.handleSignIn(req,res, db, bcrypt)});
+app.post('/signin',[
+  body('email', 'Email is not valid')
+    .isEmail()
+    .normalizeEmail()
+    .escape(),
+  body('password','Password must be a minimum of 3+ characters')
+    .exists()
+    .isLength({min:3})
+    .escape()  
+  
+] ,(req,res) =>{ signinController.handleSignIn(req,res, db, bcrypt,validationResult(req))});
 
-app.post('/register', (req,res) =>{ registerController.handleRegister(req,res, db, bcrypt)});
+app.post('/register',[
+  body('email', 'Email is not valid')
+    .isEmail()
+    .normalizeEmail()
+    .escape(),
+  body('password','Password must be a minimum of 3+ characters')
+    .exists()
+    .isLength({min:3})
+    .escape(),
+  body('name', 'Name cannot be more than 30 characters')
+    .exists()
+    .escape()
+    .isLength({max:30})  
+],
+(req,res) =>{ registerController.handleRegister(req,res, db, bcrypt,validationResult(req))});
 
-app.get('/profile/:id', (req,res) =>{ profileController.handleProfile (req,res, db)});
+//app.get('/profile/:id', (req,res) =>{ profileController.handleProfile (req,res, db)});
 
-app.put('/image', (req,res) =>{ imageController.handleImage(req,res, db)});
+app.put('/image', [
+  body('id','Must be a number')
+  .exists()
+  .escape()
+  .isNumeric()
+],(req,res) =>{ imageController.handleImage(req,res, db,validationResult(req))});
 
-app.post('/clarifai', (req,res) => clarifaiController.handleClarifai(req,res));
+app.post('/clarifai', [
+  body('input','Must be a valid image url')
+  .exists()
+], (req,res) => clarifaiController.handleClarifai(req,res,validationResult(req)));
 
 app.listen(process.env.PORT || 3000, ()=> {
   console.log(`app is running on port ${process.env.PORT || 3000}`);

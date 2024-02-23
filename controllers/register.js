@@ -1,16 +1,23 @@
-const handleRegister = async (req,res,db,bcrypt) => {
-  const {email, name, password} = req.body;
-  if (!email || !name || !password)
+const handleRegister = async (req,res,db,bcrypt,validationResult) => {
+  
+  if (!validationResult.isEmpty())
   {
     return res.status(400).json('Error');
   }
+
+  const {email, name, password} = req.body;
   
- const result =await checkIfUserExists(email,db);
-  if (result)
+  if (/\s/.test(password)) //test f password has any whitespaces
   {
     return res.status(400).json('Error');
-  } else {
-    await addUser(name, email, password,db, bcrypt).then(userAddedResult => {
+  }
+
+  const result =await checkIfUserExists(email,db);
+  if (result)
+    {
+      return res.status(400).json('Error');
+    } else {
+      await addUser(name, email, password,db, bcrypt).then(userAddedResult => {
       if (userAddedResult) {
         return  res.json('success');
       } else {

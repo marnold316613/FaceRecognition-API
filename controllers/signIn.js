@@ -1,6 +1,18 @@
-const handleSignIn =  (req,res, db, bcrypt) => {
+const handleSignIn =  (req,res, db, bcrypt, validationResult) => {
+
+
+if (!validationResult.isEmpty())
+{
+  return res.status(400).json('Error');
+}
+
   const {email, password} = req.body;
   
+  if (/\s/.test(password)) //test f password has any whitespaces
+  {
+    return res.status(400).json('Error');
+  }
+
  db.select('email','hash').from('login')
    .where({'email': email})
    .then(response => {
