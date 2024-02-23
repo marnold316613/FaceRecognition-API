@@ -11,14 +11,14 @@ const handleSignIn =  (req,res, db, bcrypt) => {
            res.json(response[0]);
          })
          .catch(err => {
-           res.status('400').json('Error');
+           res.status(400).json('Error');
          })
      }
      else {
-        res.status('400').json('Error');
+        res.status(400).json('Error');
      }
    }).catch(err => {
-     res.status('400').json('Error');
+     res.status(400).json('Error');
    })
  };
 
