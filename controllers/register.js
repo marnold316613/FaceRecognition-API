@@ -1,20 +1,34 @@
-const handleRegister = (req,res,db,bcrypt) => {
+const handleRegister = async (req,res,db,bcrypt) => {
   const {email, name, password} = req.body;
   if (!email || !name || !password)
   {
     return res.status(400).json('Error');
   }
   
-  const check =db.select('email').from('login').where({
-    email: email
-  })
-  if (check.length) {
+ const result =await checkIfUserExists(email,db);
+  if (result)
+  {
     return res.status(400).json('Error');
+  } else {
+    await addUser(name, email, password,db, bcrypt).then(userAddedResult => {
+      if (userAddedResult) {
+        return  res.json('success');
+      } else {
+        return res.status(400).json('Error');
+      }
+    })
   }
+}
 
+ async function checkIfUserExists(email,db) {
+  const response = await db.select('email').from('login').where({email: email
+  })
+    return response.length ? true : false }
+
+async function addUser(name, email, password, db, bcrypt) {
   const hash = bcrypt.hashSync(password);
-  
-  db.transaction(trx =>
+  let success =false;
+  const result = await db.transaction(trx =>
   {
     trx('login').insert({
       email: email,
@@ -30,16 +44,19 @@ const handleRegister = (req,res,db,bcrypt) => {
         joined: new Date()
 
       }).then(response => {
-        res.json('success');
+        success =true;  
         
       })
-      .catch( (e) => {res.status(400).json('error');
-        console.log('error posting to database');
+      .catch( (e) => {
+        console.log('Error adding user to database', e);
+        success =false;
       })
     })
     .then(trx.commit)
     .catch(trx.rollback);
   })
+
+  return success;
 }
 
 module.exports = {

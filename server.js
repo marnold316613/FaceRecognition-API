@@ -10,15 +10,37 @@ const profileController = require('./controllers/profile');
 const homeController = require('./controllers/home');
 const clarifaiController = require('./controllers/clarifai');
 
-const db= knex({
-  client: 'pg',
-  connection: {
-    connectionString : process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false
+
+const pool = (() => {
+  if (process.env.NODE_ENV !=='productions') 
+  {
+    return { 
+      host : '127.0.0.1',
+      port : 5432,
+      user : 'smart-brain',
+      password : 'Southern1!%',
+      database : 'smart-brain'
+      
+    }
+  } else {
+    return {
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false
+      }
     }
   }
-});
+})
+console.log(pool());
+const db= knex({
+  client: 'pg',
+  connection: pool()
+  }
+);
+
+
+
+
 
 const PORT =process.env.PORT;
 

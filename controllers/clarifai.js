@@ -1,11 +1,12 @@
-const PAT = '65c8452fcbcb43e69dfa5cc7b92133b0';
+const PAT = process.env.PAT;
 // Specify the correct user_id/app_id pairings
 // Since you're making inferences outside your app's scope
-const USER_ID = 'marnold316613';       
+const USER_ID = process.env.USER_ID;       
 const APP_ID = 'my-first-application-2c1uk';
 // Change these to whatever model and image URL you want to use
 const MODEL_ID = 'face-detection';
 const MODEL_VERSION_ID = '6dc7e46bc9124c5c8824be4822abe105';    
+
 
 const clarifaiSetup = (url) => {
   const raw = JSON.stringify({
